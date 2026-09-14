@@ -11,6 +11,11 @@ public class AutoShoot extends Command {
     private final Timer m_timer = new Timer();
 
     private final double FEED_ROTATIONS = 0.125;  
+    
+    // --- ADDED: Easily adjustable delay variables ---
+    private final double INITIAL_SPIN_UP_TIME = 1.5; 
+    private final double RECOVERY_TIME = 1.5;       
+    
     private int m_state = 0; 
 
     public AutoShoot(shooter shooterSub, feeder feederSub) {
@@ -31,8 +36,10 @@ public class AutoShoot extends Command {
     public void execute() {
         m_shooter.setTargetSpeed(0.8);
 
+        // STATE 0: INITIAL SPIN UP
         if (m_state == 0) {
-            if (m_timer.hasElapsed(0.5)) {
+            // Now checks against our new 1.0 second variable
+            if (m_timer.hasElapsed(INITIAL_SPIN_UP_TIME)) {
                 m_state = 1; 
                 m_feeder.resetEncoder(); 
             }
@@ -46,8 +53,10 @@ public class AutoShoot extends Command {
                 m_timer.restart(); 
             }
         } 
+        // STATE 2: RECOVERY PAUSE
         else if (m_state == 2) {
-            if (m_timer.hasElapsed(0.5)) {
+            // Now checks against our new 0.75 second variable
+            if (m_timer.hasElapsed(RECOVERY_TIME)) {
                 m_state = 1; 
                 m_feeder.resetEncoder(); 
             }
