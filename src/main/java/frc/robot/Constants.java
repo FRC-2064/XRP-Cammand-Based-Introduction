@@ -19,10 +19,12 @@ public final class Constants {
         public static final double kP_GYRO_TELEOP = 0.022;
         public static final double SLOW_MODE_MULTIPLIER = 0.4;
         public static final double MAX_TELEOP_TURN_SPEED = 0.5;
+        
+        public static final double kP_GYRO_AUTO = 0.04; 
     }
 
     public final class ServoConstants {
-        public static final int SERVO_MOTOR = 4; // Labeled 'Servo 1' on board
+        public static final int SERVO_MOTOR = 4; 
 
         public static final double POSITION_DEFAULT = 90.0;
         public static final double POSITION_ONE = 0.0;
@@ -31,5 +33,23 @@ public final class Constants {
 
     public final class OperatorConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
+    }
+
+    public final class ShooterConstants {
+        public static final double FEED_ROTATIONS = 0.125;  
+        public static final double INITIAL_SPIN_UP_TIME = 1.0; 
+        public static final double RECOVERY_TIME = 0.75; 
+        public static final double SHOOTER_SPEED = 0.8;
+        public static final double FEEDER_SPEED = 0.6;
+    }
+
+    public final class AutoConstants {
+        public static final edu.wpi.first.units.measure.Distance TARGET_DISTANCE_INCHES = edu.wpi.first.units.Units.Inches.of(24.0); 
+        public static final edu.wpi.first.units.measure.Distance RAMP_UP_DISTANCE = edu.wpi.first.units.Units.Inches.of(6.0);
+        public static final edu.wpi.first.units.measure.Distance RAMP_DOWN_START_DISTANCE = edu.wpi.first.units.Units.Inches.of(18.0);
+        
+        public static final double MAX_SPEED = 0.6;
+        public static final double MIN_SPEED = 0.2;
+        public static final double AUTO_SHOOT_TIME_SECONDS = 5.0; 
     }
 }

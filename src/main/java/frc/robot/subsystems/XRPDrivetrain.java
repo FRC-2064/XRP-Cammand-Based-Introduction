@@ -1,69 +1,103 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.xrp.XRPGyro;
 import edu.wpi.first.wpilibj.xrp.XRPMotor;
+import edu.wpi.first.wpilibj.xrp.XRPRangefinder;
+import edu.wpi.first.wpilibj.xrp.XRPServo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ServoConstants;
+
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Angle;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Degrees;
 
 public class XRPDrivetrain extends SubsystemBase {
+    
+    private final XRPMotor leftMotor = new XRPMotor(DriveConstants.LEFT_DRIVE_MOTOR);
+    private final XRPMotor rightMotor = new XRPMotor(DriveConstants.RIGHT_DRIVE_MOTOR);
+    private final XRPServo armServo = new XRPServo(ServoConstants.SERVO_MOTOR);
 
-  private final XRPMotor leftMotor = new XRPMotor(DriveConstants.LEFT_DRIVE_MOTOR);
-  private final XRPMotor rightMotor = new XRPMotor(DriveConstants.RIGHT_DRIVE_MOTOR);
+    private final Encoder leftEncoder = new Encoder(
+        DriveConstants.LEFT_ENCODER.aChannel(), 
+        DriveConstants.LEFT_ENCODER.bChannel()
+    );
+    private final Encoder rightEncoder = new Encoder(
+        DriveConstants.RIGHT_ENCODER.aChannel(), 
+        DriveConstants.RIGHT_ENCODER.bChannel()
+    );
 
-  private final Encoder leftEncoder = new Encoder(DriveConstants.LEFT_ENCODER.aChannel(), DriveConstants.LEFT_ENCODER.bChannel());
-  private final Encoder rightEncoder = new Encoder(DriveConstants.RIGHT_ENCODER.aChannel(), DriveConstants.RIGHT_ENCODER.bChannel());
+    private final XRPGyro gyro = new XRPGyro();
+    private final XRPRangefinder rangefinder = new XRPRangefinder();
 
-  private final XRPGyro gyro = new XRPGyro();
+    public XRPDrivetrain() {
+        leftEncoder.setDistancePerPulse(DriveConstants.DISTANCE_PER_PULSE);
+        rightEncoder.setDistancePerPulse(DriveConstants.DISTANCE_PER_PULSE);
 
-  public XRPDrivetrain() {
-    leftEncoder.setDistancePerPulse(DriveConstants.DISTANCE_PER_PULSE);
-    rightEncoder.setDistancePerPulse(DriveConstants.DISTANCE_PER_PULSE);
-    resetEncoders();
-    rightMotor.setInverted(true);
-  }
+        leftMotor.setInverted(true);
+        rightMotor.setInverted(false);
+        
+        resetEncoders();
+        resetGyro();
+    }
 
-  public void tankDrive(double leftSpeed, double rightSpeed) {
-    leftMotor.set(leftSpeed);
-    rightMotor.set(rightSpeed);
-  }
+    public void executeDrive(double leftY, double rightY, boolean squareInputs, boolean slowMode) {
+        if (slowMode) {
+            leftY *= DriveConstants.SLOW_MODE_MULTIPLIER;
+            rightY *= DriveConstants.SLOW_MODE_MULTIPLIER;
+        }
+        tankDrive(leftY, rightY);
+    }
 
-  public void stop() {
-    leftMotor.set(0);
-    rightMotor.set(0);
-  }
+    public void tankDrive(double leftSpeed, double rightSpeed) {
+        leftMotor.set(leftSpeed);
+        rightMotor.set(rightSpeed);
+    }
 
-  public void resetEncoders() {
-    leftEncoder.reset();
-    rightEncoder.reset();
-  }
+    public void stop() {
+        leftMotor.set(0.0);
+        rightMotor.set(0.0);
+    }
 
-  public void resetGyro() {
-    gyro.reset();
-  }
+    public Distance getAverageDistanceInch() {
+        double averageRaw = (leftEncoder.getDistance() + rightEncoder.getDistance()) / 2.0;
+        return Inches.of(averageRaw);
+    }
 
-  public Distance getLeftDistanceInch() {
-    return Distance.ofBaseUnits(leftEncoder.getDistance(), Inches);
-  }
+    public double getDistanceInches() {
+        return rangefinder.getDistanceInches();
+    }
 
-  public Distance getRightDistanceInch() {
-    return Distance.ofBaseUnits(rightEncoder.getDistance(), Inches);
-  }
+    public Angle getGyroAngle() {
+        return Degrees.of(gyro.getAngleZ());
+    }
 
-  public Angle getGyroAngle() {
-    return Angle.ofBaseUnits(gyro.getAngle(), Degrees);
-  }
+    public void resetEncoders() {
+        leftEncoder.reset();
+        rightEncoder.reset();
+    }
 
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Left Encoder (in)", leftEncoder.getDistance());
-    SmartDashboard.putNumber("Right Encoder (in)", rightEncoder.getDistance());
-    SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
-  }
+    public void resetGyro() {
+        gyro.reset();
+    }
+
+    public void setServoDefault() {
+        armServo.setAngle(ServoConstants.POSITION_DEFAULT);
+    }
+
+    public void setServoPositionOne() {
+        armServo.setAngle(ServoConstants.POSITION_ONE);
+    }
+
+    public void setServoPositionTwo() {
+        armServo.setAngle(ServoConstants.POSITION_TWO);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Wall Distance (Inches)", getDistanceInches());
+    }
 }
