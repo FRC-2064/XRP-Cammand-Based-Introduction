@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.xrp.XRPServo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class shooter extends SubsystemBase {
     
     private final XRPServo shooterBridge = new XRPServo(5); 
-    private boolean idleModeEnabled = false;
 
     public shooter() {}
 
@@ -21,15 +19,11 @@ public class shooter extends SubsystemBase {
     }
 
     public void runDefaultBehavior() {
-        if (idleModeEnabled) {
-            setTargetSpeed(0.6); 
-        } else {
-            stop(); 
-        }
+        stop(); 
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Shooter Idle ON", idleModeEnabled);
+        // Left blank since idle mode tracking is removed
     }
 }

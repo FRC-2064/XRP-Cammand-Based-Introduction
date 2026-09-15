@@ -37,9 +37,9 @@ public final class Constants {
 
     public final class ShooterConstants {
         public static final double FEED_ROTATIONS = 0.125;  
-        public static final double INITIAL_SPIN_UP_TIME = 1.0; 
-        public static final double RECOVERY_TIME = 0.75; 
-        public static final double SHOOTER_SPEED = 0.8;
+        public static final double INITIAL_SPIN_UP_TIME = 1.5; 
+        public static final double RECOVERY_TIME = 1.25; 
+        public static final double SHOOTER_SPEED = 0.9;
         public static final double FEEDER_SPEED = 0.6;
     }
 
