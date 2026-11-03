@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.xrp.XRPMotor;
 import edu.wpi.first.wpilibj.xrp.XRPServo;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,13 +13,13 @@ import frc.robot.Constants.ShooterConstants;
 import java.util.Set;
 
 /**
- * Shooter flywheel (XRP servo PWM → MOSFET module) and ramp gate (XRP Servo 2).
+ * Shooter flywheel (XRP motor port 2 -> MOSFET module PWM input) and ramp gate (XRP Servo 2).
  * The flywheel ramps its speed, the gate only opens after the spin-up time, and everything shuts
  * off (gate closed, flywheel 0) whenever the fire command ends or the robot is disabled.
  */
 public class Shooter extends SubsystemBase {
 
-    private final XRPServo flywheel = new XRPServo(ShooterConstants.FLYWHEEL_PWM);
+    private final XRPMotor flywheel = new XRPMotor(ShooterConstants.FLYWHEEL_MOTOR);
     private final XRPServo gate = new XRPServo(ShooterConstants.GATE_SERVO);
     private final SlewRateLimiter flywheelRamp = new SlewRateLimiter(ShooterConstants.FLYWHEEL_RAMP_PER_SECOND);
 
@@ -29,8 +30,10 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
         Preferences.initDouble(ShooterConstants.PREF_GATE_OPEN, ShooterConstants.GATE_OPEN_ANGLE);
         Preferences.initDouble(ShooterConstants.PREF_GATE_CLOSED, ShooterConstants.GATE_CLOSED_ANGLE);
-        Preferences.initDouble(ShooterConstants.PREF_SPIN_UP, ShooterConstants.SPIN_UP_SECONDS);
+        
+        // Removed Preferences.initDouble for SPIN_UP so it doesn't populate the dashboard anymore
 
+        flywheel.setInverted(false);
         stop();
     }
 
@@ -82,7 +85,7 @@ public class Shooter extends SubsystemBase {
     public void stop() {
         flywheelEnabled = false;
         flywheelRamp.reset(0.0);
-        flywheel.setPosition(0.0);
+        flywheel.set(0.0);
         closeGate();
     }
 
@@ -91,14 +94,15 @@ public class Shooter extends SubsystemBase {
     }
 
     private double getSpinUpSeconds() {
-        return Math.max(0.0, Preferences.getDouble(ShooterConstants.PREF_SPIN_UP, ShooterConstants.SPIN_UP_SECONDS));
+        // Now strictly reads the variable from Constants.java
+        return Math.max(0.0, ShooterConstants.SPIN_UP_SECONDS);
     }
 
     @Override
     public void periodic() {
         // Speed is read live so changing the D-pad preset while firing takes effect immediately.
         double output = flywheelEnabled ? flywheelRamp.calculate(getSelectedSpeed()) : 0.0;
-        flywheel.setPosition(MathUtil.clamp(output, 0.0, 1.0));
+        flywheel.set(MathUtil.clamp(output, 0.0, 1.0));
 
         SmartDashboard.putNumber("Shooter/Preset Speed %", getSelectedSpeed() * 100.0);
         SmartDashboard.putNumber("Shooter/Output %", output * 100.0);

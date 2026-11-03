@@ -3,7 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Millimeters;
 
-/** All robot-wide constants live here (nothing is hard-coded on the Arduino anymore). */
+/** All robot-wide constants live here. */
 public final class Constants {
     private Constants() {}
 
@@ -31,8 +31,7 @@ public final class Constants {
         public static final double STICK_DEADBAND = 0.08;
         public static final double SLOW_MODE_MULTIPLIER = 0.4;
 
-        // Drive-straight (Cross). NOTE: on this robot "forward" is a NEGATIVE motor value,
-        // same as the raw stick values, so this stays negative.
+        // Drive-straight (Cross)
         public static final double DRIVE_STRAIGHT_SPEED = -0.5;
         public static final double kP_GYRO_TELEOP = 0.022;
         public static final double MAX_GYRO_CORRECTION = 0.3;
@@ -42,41 +41,35 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 1;       // XRP motor port 1
         public static final double INTAKE_POWER = 1.0;
 
-        public static final int ARM_SERVO = 4;          // XRP Servo 1
+        public static final int ARM_SERVO = 4;          // XRP Servo 1 (channel 4)
         public static final double ARM_STOWED_ANGLE = 60.0;
-        public static final double ARM_DEPLOYED_ANGLE = 170.0;
+        public static final double ARM_DEPLOYED_ANGLE = 162.0;
         public static final double ARM_MIN_ANGLE = 60.0;
         public static final double ARM_MAX_ANGLE = 170.0;
     }
 
     public static final class ShooterConstants {
-        // Flywheel PWM signal: use a free servo port (standard servo PWM).
-        // Channel 6 = Servo 3 on newer XRPs. Change to 5 if you only have two servos
-        // and can free Servo 2, or use whatever free servo header you have.
-        public static final int FLYWHEEL_PWM = 6;
+        // Flywheel: XRP motor port 2 -> drives MOSFET on physical Motor 3 header
+        public static final int FLYWHEEL_MOTOR = 2;
 
-        // Ramp gate: XRP Servo 2 (signal goes straight to the gate servo)
+        // Ramp gate: XRP Servo 2 (channel 5)
         public static final int GATE_SERVO = 5;
 
-        // Gate angles. These start from the values the old Arduino sketch used (70 closed, 110 open).
-        // If the gate moves the wrong amount or direction, tune these two numbers (or the
-        // Preferences keys below on the dashboard, no redeploy needed).
+        // Gate angles
         public static final double GATE_CLOSED_ANGLE = 70.0;
-        public static final double GATE_OPEN_ANGLE = 110.0;
+        public static final double GATE_OPEN_ANGLE = 115.0;
         public static final double GATE_MIN_ANGLE = 0.0;
         public static final double GATE_MAX_ANGLE = 180.0;
 
-        // Time for the flywheel to get up to speed before the gate opens (no speed sensor).
+        // Spin-up delay and acceleration ramping
         public static final double SPIN_UP_SECONDS = 0.8;
-
-        // Flywheel acceleration limit (fraction of full power per second) to soften current spikes.
         public static final double FLYWHEEL_RAMP_PER_SECOND = 2.5;
 
-        // D-pad up/down steps through these (fraction of full power, 0..1).
-        public static final double[] SPEED_PRESETS = {0.65, 0.85, 1.0};
-        public static final int DEFAULT_PRESET_INDEX = 2; // start on full power, like the old code
+        // D-pad speed presets (fraction of full power, 0..1)
+        public static final double[] SPEED_PRESETS = {0.20, 0.3, 0.4, 0.5, 1.0};
+        public static final int DEFAULT_PRESET_INDEX = 2; // Default 100%
 
-        // Preferences keys (live-tunable from the dashboard)
+        // Preferences keys
         public static final String PREF_GATE_OPEN = "Shooter/GateOpenAngle";
         public static final String PREF_GATE_CLOSED = "Shooter/GateClosedAngle";
         public static final String PREF_SPIN_UP = "Shooter/SpinUpSeconds";
