@@ -42,4 +42,11 @@ public class RobotContainer {
     // Cross (hold): gyro-assisted drive straight.
     driver.cross().whileTrue(drivetrain.driveStraightCommand(DriveConstants.DRIVE_STRAIGHT_SPEED));
   }
+
+  /** Force stops physical outputs on all subsystems immediately when disabled. */
+  public void stopAllSubsystems() {
+    drivetrain.stop();
+    shooter.stop();
+    intake.stopWheels();
+  }
 }

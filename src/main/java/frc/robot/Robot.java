@@ -19,7 +19,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // Explicitly shut down all motors when disabling to prevent runaways
+    if (m_robotContainer != null) {
+      m_robotContainer.stopAllSubsystems();
+    }
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -27,7 +32,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Grab the selected command from the chooser via RobotContainer
-  //  m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
