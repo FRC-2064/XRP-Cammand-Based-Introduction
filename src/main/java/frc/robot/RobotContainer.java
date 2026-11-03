@@ -1,64 +1,45 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.XRPDrivetrain;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 public class RobotContainer {
 
-  private final XRPDrivetrain xrp = new XRPDrivetrain();
-  private final PS4Controller driverController = new PS4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);
+  private final Drivetrain drivetrain = new Drivetrain();
+  private final Intake intake = new Intake();
+  private final Shooter shooter = new Shooter();
+
+  private final CommandPS4Controller driver =
+      new CommandPS4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   public RobotContainer() {
-    xrp.setDefaultCommand(new RunCommand(
-        () -> xrp.executeDrive(
-            driverController.getLeftY(),
-            driverController.getRightY(),
-            false,
-            driverController.getCircleButton()
-        ),
-        xrp));
+    // Tank drive; hold Circle for slow mode.
+    drivetrain.setDefaultCommand(
+        drivetrain.driveCommand(driver::getLeftY, driver::getRightY, driver.circle()));
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
-    // Servo 1 — Square
-    new Trigger(driverController::getSquareButton)
-        .onTrue(new InstantCommand(() -> xrp.setServo1PositionOne()))
-        .onFalse(new InstantCommand(() -> xrp.setServo1ToStart()));
+    // R1 (hold): spin up, open gate after spin-up, everything stops on release/disable.
+    driver.R1().whileTrue(shooter.fireCommand());
 
-    // Servo 2 — Triangle
-    new Trigger(driverController::getTriangleButton)
-        .onTrue(new InstantCommand(() -> xrp.setServo2PositionOne()))
-        .onFalse(new InstantCommand(() -> xrp.setServo2ToStart()));
+    // D-pad up/down: shooter speed preset (works while firing).
+    driver.povUp().onTrue(Commands.runOnce(shooter::nextPreset));
+    driver.povDown().onTrue(Commands.runOnce(shooter::previousPreset));
 
-    // Intake + Servo 1 down while L1 is held
-    new Trigger(driverController::getL1Button)
-        .onTrue(new InstantCommand(() -> xrp.setServo1PositionOne()))
-        .whileTrue(new RunCommand(() -> xrp.setIntakePower(1.0)))
-        .onFalse(new InstantCommand(() -> {
-            xrp.stopIntake();
-            xrp.setServo1ToStart();
-        }));
+    // L1 (hold): arm down + intake wheels on.
+    driver.L1().whileTrue(intake.intakeCommand());
 
-    // Shooter — hold R1 (speed set here)
-    new Trigger(driverController::getR1Button)
-        .whileTrue(new RunCommand(() -> xrp.setShooter(0.25)))
-        .onFalse(new InstantCommand(() -> xrp.stopShooter()));
+    // Square (hold): arm down only.
+    driver.square().whileTrue(intake.armDeployCommand());
 
-    // Optional drive-straight assist (Cross)
-    new Trigger(driverController::getCrossButton)
-        .onTrue(new InstantCommand(() -> xrp.resetGyro()))
-        .whileTrue(new RunCommand(() -> {
-            double forwardSpeed = -0.5;
-            double angle = xrp.getGyroAngle().in(edu.wpi.first.units.Units.Degrees);
-            double turnCorrection = DriveConstants.kP_GYRO_TELEOP * angle;
-            xrp.tankDrive(forwardSpeed - turnCorrection, forwardSpeed + turnCorrection);
-        }, xrp));
+    // Cross (hold): gyro-assisted drive straight.
+    driver.cross().whileTrue(drivetrain.driveStraightCommand(DriveConstants.DRIVE_STRAIGHT_SPEED));
   }
 }
