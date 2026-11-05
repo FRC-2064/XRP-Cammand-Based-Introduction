@@ -27,8 +27,8 @@ public final class Constants {
         public static final double DISTANCE_PER_PULSE =
             (WHEEL_DIAMETER_INCHES * Math.PI) / ENCODER_TICKS_PER_REVOLUTION;
 
-        // Driving feel
-        public static final double STICK_DEADBAND = 0.08;
+        // Driving feel - increased deadband to combat stick drift
+        public static final double STICK_DEADBAND = 0.15;
         public static final double SLOW_MODE_MULTIPLIER = 0.4;
 
         // Drive-straight (Cross)
@@ -43,7 +43,7 @@ public final class Constants {
 
         public static final int ARM_SERVO = 4;          // XRP Servo 1 (channel 4)
         public static final double ARM_STOWED_ANGLE = 60.0;
-        public static final double ARM_DEPLOYED_ANGLE = 162.0;
+        public static final double ARM_DEPLOYED_ANGLE = 150.0;
         public static final double ARM_MIN_ANGLE = 60.0;
         public static final double ARM_MAX_ANGLE = 170.0;
     }
@@ -61,17 +61,16 @@ public final class Constants {
         public static final double GATE_MIN_ANGLE = 0.0;
         public static final double GATE_MAX_ANGLE = 180.0;
 
-        // Spin-up delay and acceleration ramping
+        // Spin-up delay (in seconds) and acceleration ramping
         public static final double SPIN_UP_SECONDS = 0.8;
         public static final double FLYWHEEL_RAMP_PER_SECOND = 2.5;
 
         // D-pad speed presets (fraction of full power, 0..1)
-        public static final double[] SPEED_PRESETS = {0.20, 0.3, 0.4, 0.5, 1.0};
+        public static final double[] SPEED_PRESETS = {0.6, 0.8, 1.0};
         public static final int DEFAULT_PRESET_INDEX = 2; // Default 100%
 
         // Preferences keys
         public static final String PREF_GATE_OPEN = "Shooter/GateOpenAngle";
         public static final String PREF_GATE_CLOSED = "Shooter/GateClosedAngle";
-        public static final String PREF_SPIN_UP = "Shooter/SpinUpSeconds";
     }
 }

@@ -1,9 +1,13 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Autonomous;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -17,33 +21,46 @@ public class RobotContainer {
   private final CommandPS4Controller driver =
       new CommandPS4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
   public RobotContainer() {
-    // Tank drive; hold Circle for slow mode.
     drivetrain.setDefaultCommand(
         drivetrain.driveCommand(driver::getLeftY, driver::getRightY, driver.circle()));
 
     configureButtonBindings();
+    configureAutoChooser();
   }
 
   private void configureButtonBindings() {
-    // R1 (hold): spin up, open gate after spin-up, everything stops on release/disable.
     driver.R1().whileTrue(shooter.fireCommand());
 
-    // D-pad up/down: shooter speed preset (works while firing).
     driver.povUp().onTrue(Commands.runOnce(shooter::nextPreset));
     driver.povDown().onTrue(Commands.runOnce(shooter::previousPreset));
 
-    // L1 (hold): arm down + intake wheels on.
     driver.L1().whileTrue(intake.intakeCommand());
-
-    // Square (hold): arm down only.
     driver.square().whileTrue(intake.armDeployCommand());
 
-    // Cross (hold): gyro-assisted drive straight.
     driver.cross().whileTrue(drivetrain.driveStraightCommand(DriveConstants.DRIVE_STRAIGHT_SPEED));
   }
 
-  /** Force stops physical outputs on all subsystems immediately when disabled. */
+  private void configureAutoChooser() {
+    autoChooser.setDefaultOption(
+        "1. Drive 24 in & Shoot", 
+        new Autonomous(24.0, 0.5, drivetrain, shooter));
+
+    autoChooser.addOption(
+        "2. Intake + Turn 90° + Shoot",
+        new Autonomous(24.0, 0.4, true, 90.0, drivetrain, intake, shooter));
+
+    autoChooser.addOption("3. Do Nothing", Commands.none());
+
+    SmartDashboard.putData("Auto Routine", autoChooser);
+  }
+
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
+  }
+
   public void stopAllSubsystems() {
     drivetrain.stop();
     shooter.stop();
