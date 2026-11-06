@@ -32,14 +32,18 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
+    // Hold R1: Spins flywheel to selected preset speed instantly and opens servo gate after delay
     driver.R1().whileTrue(shooter.fireCommand());
 
-    driver.povUp().onTrue(Commands.runOnce(shooter::nextPreset));
-    driver.povDown().onTrue(Commands.runOnce(shooter::previousPreset));
+    // Cycle speed presets using D-Pad Up / Down
+    driver.povUp().onTrue(Commands.runOnce(shooter::nextPreset, shooter));
+    driver.povDown().onTrue(Commands.runOnce(shooter::previousPreset, shooter));
 
+    // Intake & Arm control
     driver.L1().whileTrue(intake.intakeCommand());
     driver.square().whileTrue(intake.armDeployCommand());
 
+    // Straight drive helper
     driver.cross().whileTrue(drivetrain.driveStraightCommand(DriveConstants.DRIVE_STRAIGHT_SPEED));
   }
 

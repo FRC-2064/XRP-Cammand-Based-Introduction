@@ -43,9 +43,9 @@ public final class Constants {
 
         public static final int ARM_SERVO = 4;          // XRP Servo 1 (channel 4)
         public static final double ARM_STOWED_ANGLE = 60.0;
-        public static final double ARM_DEPLOYED_ANGLE = 150.0;
+        public static final double ARM_DEPLOYED_ANGLE = 162.0;
         public static final double ARM_MIN_ANGLE = 60.0;
-        public static final double ARM_MAX_ANGLE = 170.0;
+        public static final double ARM_MAX_ANGLE = 180.0;
     }
 
     public static final class ShooterConstants {
@@ -57,16 +57,16 @@ public final class Constants {
 
         // Gate angles
         public static final double GATE_CLOSED_ANGLE = 70.0;
-        public static final double GATE_OPEN_ANGLE = 115.0;
+        public static final double GATE_OPEN_ANGLE = 130.0;
         public static final double GATE_MIN_ANGLE = 0.0;
         public static final double GATE_MAX_ANGLE = 180.0;
 
         // Spin-up delay (in seconds) and acceleration ramping
-        public static final double SPIN_UP_SECONDS = 0.8;
+        public static final double SPIN_UP_SECONDS = 1.5;
         public static final double FLYWHEEL_RAMP_PER_SECOND = 2.5;
 
         // D-pad speed presets (fraction of full power, 0..1)
-        public static final double[] SPEED_PRESETS = {0.6, 0.8, 1.0};
+        public static final double[] SPEED_PRESETS = {0.6, 0.7, 0.8, 0.9, 1.0};
         public static final int DEFAULT_PRESET_INDEX = 2; // Default 100%
 
         // Preferences keys

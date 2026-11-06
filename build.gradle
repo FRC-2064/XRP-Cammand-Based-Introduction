@@ -42,7 +42,7 @@ wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
 //Sets the XRP Client Host
-wpi.sim.envVar("HALSIMXRP_HOST", "10.20.64.22")
+wpi.sim.envVar("HALSIMXRP_HOST", "10.20.64.20")
 wpi.sim.addXRPClient().defaultEnabled = true
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
